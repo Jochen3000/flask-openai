@@ -5,11 +5,17 @@ import openai
 from openai.embeddings_utils import get_embedding, cosine_similarity
 import pandas as pd
 import numpy as np
+import tenacity
 
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 app = Flask(__name__)
+
+@tenacity.retry(
+    wait=tenacity.wait_fixed(2),
+    stop=tenacity.stop_after_attempt(2),
+)
 
 @app.route("/")
 def hello_world():
@@ -29,8 +35,11 @@ def search():
 
     results = sorted_by_similarity['text'].values.tolist()
 
-    # Render the search results template, passing in the search query and results
-    return results
+       # Return the results as a JSON response
+    return {"query": query, "results": results}
+
+if __name__ == '__main__':
+    app.run()
 
 
 
