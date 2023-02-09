@@ -30,7 +30,7 @@ def search():
     results = sorted_by_similarity['text'].values.tolist()
 
     # Render the search results template, passing in the search query and results
-    return render_template('search_results.html', query=query, results=results)
+    return results
 
 
 
