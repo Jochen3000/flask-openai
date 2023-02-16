@@ -25,6 +25,13 @@ app = Flask(__name__)
 def hello_world():
     return "<p>Hello, World!</p>"
 
+# Upload
+@app.route('/upload', methods=['POST'])
+def upload():
+    file = request.files['file']  
+    file.save('imports/' + file.filename)  
+    return 'File uploaded successfully'
+
 # Simple Prompt
 @app.route('/simple-prompt', methods=['POST'])
 def simple_prompt():
