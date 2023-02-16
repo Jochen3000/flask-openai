@@ -6,11 +6,11 @@ from openai.embeddings_utils import get_embedding, cosine_similarity
 import pandas as pd
 import numpy as np
 from os.path import splitext, exists
-from src.short_summary import break_up_file_to_chunks, convert_to_detokenized_text
+from src.summary import break_up_file_to_chunks, convert_to_detokenized_text
 from nltk.tokenize import word_tokenize
 
 # Get OpenAI key
-load_dotenv()
+load_dotenv(".env")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Load csv
@@ -57,6 +57,39 @@ def short_summary():
     short_summary = response["choices"][0]["text"]
     return jsonify({'summary': short_summary})
 
+# Full Summary
+prompt_response = []
+
+@app.route('/full-summary', methods=['GET'])
+def summarize():
+    chunks = break_up_file_to_chunks(filename)
+    for i, chunk in enumerate(chunks):
+        prompt_request = "Summarize this user research: " + convert_to_detokenized_text(chunks[0])
+        response = openai.Completion.create(
+                model="text-davinci-003",
+                prompt=prompt_request,
+                temperature=.5,
+                max_tokens=200,
+                top_p=1,
+                frequency_penalty=0,
+                presence_penalty=0
+        )
+        prompt_response.append(response["choices"][0]["text"])
+
+    prompt_request = "Consolidate these user research summaries: " + str(prompt_response)
+
+    response = openai.Completion.create(
+            model="text-davinci-003",
+            prompt=prompt_request,
+            temperature=.5,
+            max_tokens=500,
+            top_p=1,
+            frequency_penalty=0,
+            presence_penalty=0
+            )
+
+    full_summary = response["choices"][0]["text"]
+    return jsonify({'summary': full_summary})
 
 if __name__ == '__main__':
     app.run()

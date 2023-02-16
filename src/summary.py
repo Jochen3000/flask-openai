@@ -1,11 +1,9 @@
 
-# Summarize the first 2000 tokens
+# Helper functions for summaries
 
 from nltk.tokenize import word_tokenize
 
 # Split into chunks
-filename = "imports/summary-all.csv"
-
 def break_up_file(tokens, chunk_size, overlap_size):
     if len(tokens) <= chunk_size:
         yield tokens
