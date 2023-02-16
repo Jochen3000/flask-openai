@@ -15,7 +15,6 @@ load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Initialize tokenizer
-nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 
 # Load csv
@@ -61,7 +60,6 @@ def summarize():
     )
     summary_small = response["choices"][0]["text"]
     return jsonify({'summary': summary_small})
-
 
 
 if __name__ == '__main__':
