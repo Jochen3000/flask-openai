@@ -6,16 +6,12 @@ from openai.embeddings_utils import get_embedding, cosine_similarity
 import pandas as pd
 import numpy as np
 from os.path import splitext, exists
-import nltk
-from summarize_short import break_up_file_to_chunks, convert_to_detokenized_text
-
+from src.short_summary import break_up_file_to_chunks, convert_to_detokenized_text
+from nltk.tokenize import word_tokenize
 
 # Get OpenAI key
 load_dotenv()
 openai.api_key = os.getenv("OPENAI_API_KEY")
-
-# Initialize tokenizer
-from nltk.tokenize import word_tokenize
 
 # Load csv
 df = pd.read_csv("imports/summary-all.csv")
@@ -24,14 +20,14 @@ filename = "imports/summary-all.csv"
 # Create instance of flask
 app = Flask(__name__)
 
-# Test route
+# Home route
 @app.route("/")
 def hello_world():
     return "<p>Hello, World!</p>"
 
 # Simple Prompt
-@app.route('/generate-text', methods=['POST'])
-def generate_text():
+@app.route('/simple-prompt', methods=['POST'])
+def simple_prompt():
     prompt = request.form['prompt']
     response = openai.Completion.create(
     model="text-davinci-003",
@@ -44,9 +40,9 @@ def generate_text():
 )
     return response.choices[0].text
 
-# Summary Prompt
-@app.route('/summarize', methods=['GET'])
-def summarize():
+# Short Summary
+@app.route('/short-summary', methods=['GET'])
+def short_summary():
     chunks = break_up_file_to_chunks(filename)
     prompt_request = "Summarize this user research: " + convert_to_detokenized_text(chunks[0])
     response = openai.Completion.create(
@@ -58,8 +54,8 @@ def summarize():
             frequency_penalty=0,
             presence_penalty=0
     )
-    summary_small = response["choices"][0]["text"]
-    return jsonify({'summary': summary_small})
+    short_summary = response["choices"][0]["text"]
+    return jsonify({'summary': short_summary})
 
 
 if __name__ == '__main__':
