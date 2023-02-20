@@ -1,29 +1,30 @@
 import os
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 import openai
-from openai.embeddings_utils import get_embedding, cosine_similarity
-import pandas as pd
-import numpy as np
-from os.path import splitext, exists
-from src.summary import break_up_file_to_chunks, convert_to_detokenized_text
-from nltk.tokenize import word_tokenize
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
+
+# import blueprints
 from src.default import default_bp
+from src.upload import upload_bp
+from src.prompt import prompt_bp
+from src.short_summary import short_summary_bp
+from src.full_summary import full_summary_bp
 
 # Get OpenAI key
 load_dotenv(".env")
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-# Load csv
-df = pd.read_csv("imports/summary-all.csv")
-filename = "imports/summary-all.csv"
-
 # Create instance of flask
 app = Flask(__name__)
-app.register_blueprint(default_bp)
 
+# blueprint routes
+app.register_blueprint(default_bp)
+app.register_blueprint(upload_bp)
+app.register_blueprint(prompt_bp)
+app.register_blueprint(short_summary_bp)
+app.register_blueprint(full_summary_bp)
 
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -73,78 +74,6 @@ class Video(Resource):
 
 api.add_resource(Video, "/video")
 
-# Upload
-@app.route('/upload', methods=['POST'])
-def upload():
-    file = request.files['file']  
-    file.save('imports/' + file.filename)  
-    return 'File uploaded successfully'
-
-# Simple Prompt
-@app.route('/simple-prompt', methods=['POST'])
-def simple_prompt():
-    prompt = request.form['prompt']
-    response = openai.Completion.create(
-    model="text-davinci-003",
-    prompt=prompt,
-    temperature=0.5,
-    max_tokens=256,
-    top_p=1,
-    frequency_penalty=0,
-    presence_penalty=0
-)
-    return response.choices[0].text
-
-# Short Summary
-@app.route('/short-summary', methods=['GET'])
-def short_summary():
-    chunks = break_up_file_to_chunks(filename)
-    prompt_request = "Summarize this user research: " + convert_to_detokenized_text(chunks[0])
-    response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt_request,
-            temperature=.5,
-            max_tokens=200,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-    )
-    short_summary = response["choices"][0]["text"]
-    return jsonify({'summary': short_summary})
-
-# Full Summary
-prompt_response = []
-
-@app.route('/full-summary', methods=['GET'])
-def summarize():
-    chunks = break_up_file_to_chunks(filename)
-    for i, chunk in enumerate(chunks):
-        prompt_request = "Summarize this user research: " + convert_to_detokenized_text(chunks[0])
-        response = openai.Completion.create(
-                model="text-davinci-003",
-                prompt=prompt_request,
-                temperature=.5,
-                max_tokens=200,
-                top_p=1,
-                frequency_penalty=0,
-                presence_penalty=0
-        )
-        prompt_response.append(response["choices"][0]["text"])
-
-    prompt_request = "Consolidate these user research summaries: " + str(prompt_response)
-
-    response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=prompt_request,
-            temperature=.5,
-            max_tokens=500,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0
-            )
-
-    full_summary = response["choices"][0]["text"]
-    return jsonify({'summary': full_summary})
 
 if __name__ == '__main__':
     app.run()
