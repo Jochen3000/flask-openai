@@ -10,6 +10,7 @@ from src.summary import break_up_file_to_chunks, convert_to_detokenized_text
 from nltk.tokenize import word_tokenize
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
+from src.default import default_bp
 
 # Get OpenAI key
 load_dotenv(".env")
@@ -21,6 +22,9 @@ filename = "imports/summary-all.csv"
 
 # Create instance of flask
 app = Flask(__name__)
+app.register_blueprint(default_bp)
+
+
 api = Api(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db = SQLAlchemy(app)
@@ -68,12 +72,6 @@ class Video(Resource):
 		return video, 201
 
 api.add_resource(Video, "/video")
-
-
-# Home route
-@app.route("/")
-def hello_world():
-    return "<p>Hello, World!</p>"
 
 # Upload
 @app.route('/upload', methods=['POST'])
