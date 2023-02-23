@@ -10,6 +10,7 @@ from src.upload import upload_bp
 from src.prompt import prompt_bp
 from src.short_summary import short_summary_bp
 from src.full_summary import full_summary_bp
+from src.query import query_bp
 
 # Get OpenAI key
 load_dotenv(".env")
@@ -29,6 +30,7 @@ app.register_blueprint(upload_bp)
 app.register_blueprint(prompt_bp)
 app.register_blueprint(short_summary_bp)
 app.register_blueprint(full_summary_bp)
+app.register_blueprint(query_bp)
 
 
 class UserInterview:
