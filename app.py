@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify
 import openai
 from pymongo import MongoClient
+from flask_cors import CORS
 
 # import blueprints
 from src.default import default_bp
@@ -18,6 +19,9 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Create instance of flask
 app = Flask(__name__)
+
+# Allow CORS
+CORS(app)
 
 # Connect to mongodb
 client = MongoClient('mongodb://localhost:27017/')
