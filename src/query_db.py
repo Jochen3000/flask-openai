@@ -97,13 +97,13 @@ def answer_question(
     except Exception as e:
         print(e)
         return ""
-
+    
 @querydb_bp.route('/query-db', methods=['POST'])
 def get_answer():
     data = request.json
-    question = data['question']
+    question = data['inputPrompt']
     result = answer_question(df, question=question)
-    return jsonify({"answer": result})
+    return jsonify({"botMessage": result})
 
 
 
