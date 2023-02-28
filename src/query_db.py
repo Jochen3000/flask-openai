@@ -4,6 +4,7 @@ from flask import Blueprint, jsonify, request
 import openai
 from pymongo import MongoClient
 from bson import ObjectId
+from flask_cors import CORS, cross_origin
 import pandas as pd
 import numpy as np
 from openai.embeddings_utils import distances_from_embeddings
@@ -98,15 +99,30 @@ def answer_question(
         print(e)
         return ""
     
+# @querydb_bp.route('/query-db', methods=['POST'])
+# def get_answer():
+#     data = request.json
+#     question = data['chatPrompt']
+#     result = answer_question(df, question=question)
+#     return jsonify({"botResponse": result})
+
+# cors config
+cors = CORS(querydb_bp)
+
+# make stuff work
+@querydb_bp.after_request 
+def after_request(response):
+    header = response.headers
+    header['Access-Control-Allow-Origin'] = '*'
+    # Other headers can be added here if needed
+    return response
+
 @querydb_bp.route('/query-db', methods=['POST'])
-def get_answer():
+@cross_origin()
+def hello_world():
     data = request.json
-    question = data['inputPrompt']
-    result = answer_question(df, question=question)
-    return jsonify({"botMessage": result})
-
-
-
-
+    question = data['chatPrompt']
+    print(question) 
+    return jsonify({"botResponse": 'hello'})
 
 
