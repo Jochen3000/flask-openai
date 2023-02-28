@@ -5,7 +5,8 @@ from pymongo import MongoClient
 from bson import ObjectId
 
 # Connect to mongodb
-db_client = MongoClient(os.getenv("MONGO_DB_URL"))
+# db_client = MongoClient(os.getenv("MONGO_DB_URL"))
+db_client = MongoClient('mongodb://localhost:27017/')
 db = db_client['userresearch']
 collection = db['interviews']
 

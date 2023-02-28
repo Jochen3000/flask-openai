@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from flask import Flask, jsonify, request
 import openai
 from pymongo import MongoClient
-from flask_cors import CORS, cross_origin
+from flask_cors import CORS
 from bson import ObjectId
 
 # import blueprints
@@ -20,7 +20,6 @@ from src.database import database_bp
 load_dotenv(".env")
 app = Flask(__name__)
 cors = CORS(app)
-app.config['CORS_HEADERS'] = 'Content-Type'
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
@@ -34,17 +33,7 @@ app.register_blueprint(query_bp)
 app.register_blueprint(querydb_bp)
 app.register_blueprint(database_bp)
 
-
-# make stuff work
-@app.after_request 
-def after_request(response):
-    header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
-    # Other headers can be added here if needed
-    return response
-
 @app.route('/test', methods=['POST'])
-@cross_origin()
 def hello_world():
     data = request.json
     print(data) 

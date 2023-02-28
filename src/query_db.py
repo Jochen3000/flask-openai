@@ -12,7 +12,8 @@ from openai.embeddings_utils import distances_from_embeddings
 querydb_bp = Blueprint('querydb_bp', __name__)
 
 # Connect to mongodb
-db_client = MongoClient(os.getenv("MONGO_DB_URL"))
+# db_client = MongoClient(os.getenv("MONGO_DB_URL"))
+db_client = MongoClient('mongodb://localhost:27017/')
 db = db_client['userresearch']
 collection = db['interviews']
 
