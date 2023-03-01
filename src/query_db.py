@@ -12,8 +12,7 @@ from openai.embeddings_utils import distances_from_embeddings
 querydb_bp = Blueprint('querydb_bp', __name__)
 
 # Connect to mongodb
-# db_client = MongoClient(os.getenv("MONGO_DB_URL"))
-db_client = MongoClient('mongodb://localhost:27017/')
+db_client = MongoClient(os.getenv("MONGO_DB_URL"))
 db = db_client['userresearch']
 collection = db['interviews']
 
@@ -100,30 +99,12 @@ def answer_question(
         print(e)
         return ""
     
-# @querydb_bp.route('/query-db', methods=['POST'])
-# def get_answer():
-#     data = request.json
-#     question = data['chatPrompt']
-#     result = answer_question(df, question=question)
-#     return jsonify({"botResponse": result})
-
-# cors config
-cors = CORS(querydb_bp)
-
-# make stuff work
-@querydb_bp.after_request 
-def after_request(response):
-    header = response.headers
-    header['Access-Control-Allow-Origin'] = '*'
-    # Other headers can be added here if needed
-    return response
-
 @querydb_bp.route('/query-db', methods=['POST'])
-@cross_origin()
-def hello_world():
+def get_answer():
     data = request.json
     question = data['chatPrompt']
-    print(question) 
-    return jsonify({"botResponse": 'hello'})
+    result = answer_question(df, question=question)
+    return jsonify({"botResponse": result})
+
 
 
