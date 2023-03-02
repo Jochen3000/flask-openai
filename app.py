@@ -15,6 +15,7 @@ from src.full_summary import full_summary_bp
 from src.query import query_bp
 from src.query_db import querydb_bp
 from src.database import database_bp
+from src.listdb import listdb_bp
 
 # configuration
 load_dotenv(".env")
@@ -32,6 +33,7 @@ app.register_blueprint(full_summary_bp)
 app.register_blueprint(query_bp)
 app.register_blueprint(querydb_bp)
 app.register_blueprint(database_bp)
+app.register_blueprint(listdb_bp)
 
 @app.route('/test', methods=['POST'])
 def hello_world():
