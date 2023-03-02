@@ -18,12 +18,18 @@ collection = db['interviews']
 
 # Get embeddings from mongodb
 def get_user_interview_by_id(id):
-    result = collection.find_one({'embeddings': 1})
-    return result
+    result = collection.find_one({'_id': ObjectId(id)}, {'userid': 1, 'embeddings': 1})
+    if result is None:
+        return None
+    return result['embeddings']
 
 csv_data = get_user_interview_by_id('63f4b29a2f449306afd690b7')
 
-df = csv_data
+# Read the string as a file-like object using StringIO
+csv_file = io.StringIO(csv_data)
+
+# Read the CSV data from the file-like object using pd.read_csv
+df = pd.read_csv(csv_file, index_col=0)
 df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
 
 def create_context(question, df, max_len=1800, size="ada"):
