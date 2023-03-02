@@ -11,26 +11,33 @@ from openai.embeddings_utils import distances_from_embeddings
 
 querydb_bp = Blueprint('querydb_bp', __name__)
 
-# Connect to mongodb
-db_client = MongoClient(os.getenv("MONGO_DB_URL"))
-db = db_client['userresearch']
-collection = db['interviews']
+@querydb_bp.route('/query-db', methods=['POST'])
+def get_answer():
+    # Connect to mongodb
+    db_client = MongoClient(os.getenv("MONGO_DB_URL"))
+    db = db_client['userresearch']
+    collection = db['interviews']
 
-# Get embeddings from mongodb
-def get_first_user_interview():
-    result = collection.find_one({}, {'userid': 1, 'embeddings': 1})
-    if result is None:
-        return None
-    return result['embeddings']
+    # Get embeddings from mongodb
+    def get_first_user_interview():
+        result = collection.find_one({}, {'userid': 1, 'embeddings': 1})
+        if result is None:
+            return None
+        return result['embeddings']
 
-csv_data = get_first_user_interview()
+    csv_data = get_first_user_interview()
 
-# Read the string as a file-like object using StringIO
-csv_file = io.StringIO(csv_data)
+    # Read the string as a file-like object using StringIO
+    csv_file = io.StringIO(csv_data)
 
-# Read the CSV data from the file-like object using pd.read_csv
-df = pd.read_csv(csv_file, index_col=0)
-df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
+    # Read the CSV data from the file-like object using pd.read_csv
+    df = pd.read_csv(csv_file, index_col=0)
+    df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
+
+    data = request.json
+    question = data['chatPrompt']
+    result = answer_question(df, question=question)
+    return jsonify({"botResponse": result})
 
 def create_context(question, df, max_len=1800, size="ada"):
 
@@ -99,12 +106,7 @@ def answer_question(
         print(e)
         return ""
     
-@querydb_bp.route('/query-db', methods=['POST'])
-def get_answer():
-    data = request.json
-    question = data['chatPrompt']
-    result = answer_question(df, question=question)
-    return jsonify({"botResponse": result})
+
 
 
 
