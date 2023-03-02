@@ -23,10 +23,7 @@ def get_user_interview_by_id(id):
 
 csv_data = get_user_interview_by_id('63f4b29a2f449306afd690b7')
 
-# df = csv_data
-
-# loading from file to fix deployment TEMP
-df=pd.read_csv('./processed/userresearch.csv', index_col=0)
+df = csv_data
 df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
 
 def create_context(question, df, max_len=1800, size="ada"):
