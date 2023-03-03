@@ -16,6 +16,7 @@ from src.query import query_bp
 from src.query_db import querydb_bp
 from src.database import database_bp
 from src.listdb import listdb_bp
+from src.whisper import whisper_bp
 
 # configuration
 load_dotenv(".env")
@@ -34,6 +35,7 @@ app.register_blueprint(query_bp)
 app.register_blueprint(querydb_bp)
 app.register_blueprint(database_bp)
 app.register_blueprint(listdb_bp)
+app.register_blueprint(whisper_bp)
 
 @app.route('/test', methods=['POST'])
 def hello_world():
