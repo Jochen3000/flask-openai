@@ -23,12 +23,4 @@ def whisper_submit():
     os.remove(file_path)
     os.rmdir(temp_dir)
 
-    # create a response JSON object
-    response_data = {"transcript": transcript}
-
-    # set the Content-Type header to application/json
-    headers = {"Content-Type": "application/json"}
-
-    # return the response as JSON with the appropriate header
-    return jsonify(response_data), 200, headers
-
+    return transcript
