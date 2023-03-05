@@ -4,9 +4,11 @@ import openai
 from pymongo import MongoClient
 from bson import ObjectId, json_util
 import json
+import certifi
 
 # Connect to mongodb
-db_client = MongoClient(os.getenv("MONGO_DB_URL"))
+connection_string = os.getenv('MONGO_DB_URL')
+db_client = MongoClient(connection_string, tlsCAFile=certifi.where())
 db = db_client['userresearch']
 collection = db['interviews']
 

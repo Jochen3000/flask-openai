@@ -8,13 +8,15 @@ from flask_cors import CORS, cross_origin
 import pandas as pd
 import numpy as np
 from openai.embeddings_utils import distances_from_embeddings
+import certifi
 
 querydb_bp = Blueprint('querydb_bp', __name__)
 
 @querydb_bp.route('/query-db', methods=['POST'])
 def get_answer():
     # Connect to mongodb
-    db_client = MongoClient(os.getenv("MONGO_DB_URL"))
+    connection_string = os.getenv('MONGO_DB_URL')
+    db_client = MongoClient(connection_string, tlsCAFile=certifi.where())
     db = db_client['userresearch']
     collection = db['interviews']
 
