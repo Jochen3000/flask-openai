@@ -6,8 +6,16 @@ from openai.embeddings_utils import distances_from_embeddings
 
 query_bp = Blueprint('query_bp', __name__)
 
-df=pd.read_csv('./processed/userresearch.csv', index_col=0)
-df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
+@query_bp.route('/query', methods=['POST'])
+def get_answer():
+
+    df=pd.read_csv('./processed/all-files.csv', index_col=0)
+    df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
+
+    data = request.json
+    question = data['chatPrompt']
+    result = answer_question(df, question=question)
+    return jsonify({"botResponse": result})
 
 def create_context(question, df, max_len=1800, size="ada"):
 
@@ -75,13 +83,6 @@ def answer_question(
     except Exception as e:
         print(e)
         return ""
-
-@query_bp.route('/query', methods=['POST'])
-def get_answer():
-    data = request.json
-    question = data['question']
-    result = answer_question(df, question=question)
-    return jsonify({"answer": result})
 
 
 
