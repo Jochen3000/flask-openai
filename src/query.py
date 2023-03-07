@@ -9,10 +9,16 @@ query_bp = Blueprint('query_bp', __name__)
 @query_bp.route('/query', methods=['POST'])
 def get_answer():
 
-    df=pd.read_csv('./processed/all-files.csv', index_col=0)
-    df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
-
     data = request.json
+    filename = data.get('filename')
+    if not filename:
+        return jsonify({"error": "filename parameter missing"}), 400
+    try:
+        df = pd.read_csv(f'./processed/{filename}', index_col=0)
+        df['embeddings'] = df['embeddings'].apply(eval).apply(np.array)
+    except FileNotFoundError:
+        return jsonify({"error": "file not found"}), 404
+
     question = data['chatPrompt']
     result = answer_question(df, question=question)
     return jsonify({"botResponse": result})
