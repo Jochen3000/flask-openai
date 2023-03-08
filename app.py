@@ -13,6 +13,7 @@ from src.prompt import prompt_bp
 from src.short_summary import short_summary_bp
 from src.full_summary import full_summary_bp
 from src.query import query_bp
+from src.query_doku import querydoku_bp
 from src.query_db import querydb_bp
 from src.database import database_bp
 from src.listdb import listdb_bp
@@ -32,6 +33,7 @@ app.register_blueprint(prompt_bp)
 app.register_blueprint(short_summary_bp)
 app.register_blueprint(full_summary_bp)
 app.register_blueprint(query_bp)
+app.register_blueprint(querydoku_bp)
 app.register_blueprint(querydb_bp)
 app.register_blueprint(database_bp)
 app.register_blueprint(listdb_bp)
