@@ -55,3 +55,6 @@ venv/
 .env
 env.bak/
 venv.bak/
+
+# Perf tests
+locust.py
