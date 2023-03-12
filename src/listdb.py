@@ -16,7 +16,7 @@ listdb_bp = Blueprint('listdb_bp', __name__)
 
 @listdb_bp.route('/listdb', methods=['GET'])
 def get_first_user_interview():
-    cursor = collection.find({}, {'_id': 1, 'title': 1})
+    cursor = collection.find({}, {'_id': 1, 'title': 1, 'filename': 1})
     result = []
     for document in cursor:
         document['_id'] = str(document['_id'])
